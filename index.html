@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Exec | Premium Roblox Script Executor</title>
+    <style>
+        :root {
+            --primary: #5865F2;
+            --secondary: #57F287;
+            --accent: #FEE75C;
+            --dark: #1e1e2d;
+            --darker: #12121a;
+            --text: #f0f0f5;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: var(--darker);
+            color: var(--text);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(88, 101, 242, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(87, 242, 135, 0.15) 0%, transparent 50%);
+        }
+        
+        /* Glowing animated background elements */
+        .bg-blur {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            z-index: -1;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .bg-blur:nth-child(1) {
+            background: var(--primary);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        
+        .bg-blur:nth-child(2) {
+            background: var(--secondary);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 3s;
+        }
+        
+        .bg-blur:nth-child(3) {
+            background: var(--accent);
+            top: 50%;
+            right: -150px;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 30px); }
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            background: rgba(30, 30, 45, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #4752c4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero h1 span {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .hero-image {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 500px;
+            height: 500px;
+            background: url('https://i.imgur.com/JXQ2hQy.png') no-repeat center center;
+            background-size: contain;
+            z-index: 1;
+            animation: float 6s infinite ease-in-out;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 100px 5%;
+            background: rgba(30, 30, 45, 0.5);
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .section-header p {
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.2);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        /* Executor Section */
+        .executor {
+            padding: 100px 5%;
+            position: relative;
+        }
+        
+        .executor-container {
+            display: flex;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .executor-content {
+            flex: 1;
+        }
+        
+        .executor-image {
+            flex: 1;
+            position: relative;
+            min-height: 500px;
+        }
+        
+        .executor-window {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #1e1e2d;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        
+        .executor-header {
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .executor-dots {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red {
+            background: #ff5f56;
+        }
+        
+        .dot-yellow {
+            background: #ffbd2e;
+        }
+        
+        .dot-green {
+            background: #27c93f;
+        }
+        
+        .executor-title {
+            margin-left: 15px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .executor-body {
+            padding: 20px;
+            height: calc(100% - 40px);
+        }
+        
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            background: #1e1e2d;
+            border: none;
+            color: #f0f0f5;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+        
+        .executor-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: rgba(88, 101, 242, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .executor-btn {
+            background: var(--primary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .executor-btn:hover {
+            background: #4752c4;
+            transform: translateY(-2px);
+        }
+        
+        /* Scripts Section */
+        .scripts {
+            padding: 100px 5%;
+            background: rgba(30, 30, 45, 0.5);
+        }
+        
+        .scripts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        
+        .script-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .script-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.2);
+        }
+        
+        .script-thumbnail {
+            height: 150px;
+            background: linear-gradient(135deg, #5865F2, #57F287);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .script-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .script-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .script-content {
+            padding: 20px;
+        }
+        
+        .script-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .script-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .script-author img {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+        }
+        
+        .script-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .script-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Discord Section */
+        .discord {
+            padding: 100px 5%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .discord-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .discord-widget {
+            margin-top: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            display: inline-block;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .discord-widget iframe {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        /* Footer */
+        footer {
+            background: #12121a;
+            padding: 50px 5%;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-col h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .footer-col ul {
+            list-style: none;
+        }
+        
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-col ul li a {
+            color: var(--text);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-col ul li a:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+        
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            color: var(--text);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-image {
+                opacity: 0.3;
+                right: -100px;
+            }
+            
+            .executor-container {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Background Elements -->
+    <div class="bg-blur"></div>
+    <div class="bg-blur"></div>
+    <div class="bg-blur"></div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <img src="https://i.imgur.com/JXQ2hQy.png" alt="Nexus Logo">
+            <span>Nexus Exec</span>
+        </div>
+        
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#executor">Executor</a>
+            <a href="#scripts">Scripts</a>
+            <a href="#discord">Discord</a>
+        </div>
+        
+        <div class="auth-buttons">
+            <button class="btn btn-outline">Login</button>
+            <button class="btn btn-primary">Download</button>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>The Most Powerful <span>Roblox Executor</span> Ever Created</h1>
+            <p>Nexus Exec offers unparalleled performance, security, and features for all your Roblox scripting needs. Join over 500,000 users worldwide.</p>
+            
+            <div class="hero-buttons">
+                <button class="btn btn-primary">Download Now</button>
+                <button class="btn btn-outline">View Scripts</button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">500K+</span>
+                    <span class="stat-label">Users</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Scripts</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">99.9%</span>
+                    <span class="stat-label">Uptime</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-image"></div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Premium Features</h2>
+            <p>Nexus Exec comes packed with powerful features to enhance your Roblox experience</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Our custom engine executes scripts faster than any other executor available, with near-zero injection time.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Undetected</h3>
+                <p>Advanced anti-ban systems ensure you stay safe while using our executor in your favorite games.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h3>Script Hub</h3>
+                <p>Access thousands of community-made scripts directly from our built-in script hub with one-click execution.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3>Custom UI</h3>
+                <p>Fully customizable interface with themes, layouts, and personalization options to suit your style.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>Lua Editor</h3>
+                <p>Built-in advanced Lua editor with syntax highlighting, auto-completion, and error checking.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3>Auto Updates</h3>
+                <p>Regular updates with new features and bypasses to ensure compatibility with the latest Roblox versions.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Executor Section -->
+    <section class="executor" id="executor">
+        <div class="section-header">
+            <h2>Powerful In-App Executor</h2>
+            <p>Experience the most advanced script execution environment ever created for Roblox</p>
+        </div>
+        
+        <div class="executor-container">
+            <div class="executor-content">
+                <h3>Next-Generation Script Execution</h3>
+                <p>Our executor features a complete Lua environment with debugging tools, script saving, and direct access to our script database.</p>
+                
+                <div style="margin-top: 30px;">
+                    <h4>Key Benefits:</h4>
+                    <ul style="margin-top: 15px; list-style: none;">
+                        <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
+                            <span>Multi-threaded script execution</span>
+                        </li>
+                        <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
+                            <span>Built-in script organizer</span>
+                        </li>
+                        <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
+                            <span>Auto-save and version history</span>
+                        </li>
+                        <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
+                            <span>Direct script sharing to Discord</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <button class="btn btn-primary" style="margin-top: 30px;">Get Started</button>
+            </div>
+            
+            <div class="executor-image">
+                <div class="executor-window">
+                    <div class="executor-header">
+                        <div class="executor-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="executor-title">script.lua - Nexus Exec</div>
+                    </div>
+                    <div class="executor-body">
+                        <textarea class="code-editor" spellcheck="false">-- Welcome to Nexus Exec!
+-- Try this simple script:
+
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+if character then
+    local humanoid = character:WaitForChild("Humanoid")
+    
+    -- Super jump script
+    humanoid.JumpPower = 100
+    
+    -- Fly script
+    local flyEnabled = false
+    local bodyVelocity = Instance.new("BodyVelocity", character.HumanoidRootPart)
+    
+    game:GetService("UserInputService").InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.F then
+            flyEnabled = not flyEnabled
+            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        end
+    end)
+    
+    game:GetService("RunService").Heartbeat:Connect(function()
+        if flyEnabled then
+            bodyVelocity.Velocity = Vector3.new(0, 10, 0)
+        end
+    end)
+end
+
+print("Script executed successfully!")</textarea>
+                    </div>
+                    <div class="executor-footer">
+                        <div>Line 25, Column 12</div>
+                        <button class="executor-btn">Execute Script</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Scripts Section -->
+    <section class="scripts" id="scripts">
+        <div class="section-header">
+            <h2>Popular Scripts</h2>
+            <p>Browse our collection of the most popular community scripts</p>
+        </div>
+        
+        <div class="scripts-grid">
+            <div class="script-card">
+                <div class="script-thumbnail">
+                    <img src="https://i.imgur.com/JXQ2hQy.png" alt="Script Thumbnail">
+                    <div class="script-badge">Featured</div>
+                </div>
+                <div class="script-content">
+                    <h3 class="script-title">Infinite Yield</h3>
+                    <div class="script-author">
+                        <img src="https://i.imgur.com/JXQ2hQy.png" alt="Author">
+                        <span>Edge</span>
+                    </div>
+                    <div class="script-stats">
+                        <span><i class="fas fa-download"></i> 50K+</span>
+                        <span><i class="fas fa-thumbs-up"></i> 98%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="script-card">
+                <div class="script-thumbnail">
+                    <img src="https://i.imgur.com/JXQ2hQy.png" alt="Script Thumbnail">
+                    <div class="script-badge">New</div>
+                </div>
+                <div class="script-content">
+                    <h3 class="script-title">Dark Dex</h3>
+                    <div class="script-author">
+                        <img src="https://i.imgur.com/JXQ2hQy.png" alt="Author">
+                        <span>BrickMan</span>
+                    </div>
+                    <div class="script-stats">
+                        <span><i class="fas fa-download"></i> 25K+</span>
+                        <span><i class="fas fa-thumbs-up"></i> 95%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="script-card">
+                <div class="script-thumbnail">
+                    <img src="https://i.imgur.com/JXQ2hQy.png" alt="Script Thumbnail">
+                    <div class="script-badge">Popular</div>
+                </div>
+                <div class="script-content">
+                    <h3 class="script-title">Owl Hub</h3>
+                    <div class="script-author">
+                        <img src="https://i.imgur.com/JXQ2hQy.png" alt="Author">
+                        <span>Owl</span>
+                    </div>
+                    <div class="script-stats">
+                        <span><i class="fas fa-download"></i> 40K+</span>
+                        <span><i class="fas fa-thumbs-up"></i> 97%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="script-card">
+                <div class="script-thumbnail">
+                    <img src="https://i.imgur.com/JXQ2hQy.png" alt="Script Thumbnail">
+                </div>
+                <div class="script-content">
+                    <h3 class="script-title">Fates Admin</h3>
+                    <div class="script-author">
+                        <img src="https://i.imgur.com/JXQ2hQy.png" alt="Author">
+                        <span>Fate</span>
+                    </div>
+                    <div class="script-stats">
+                        <span><i class="fas fa-download"></i> 35K+</span>
+                        <span><i class="fas fa-thumbs-up"></i> 96%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 50px;">
+            <button class="btn btn-primary">Browse All Scripts</button>
+        </div>
+    </section>
+    
+    <!-- Discord Section -->
+    <section class="discord" id="discord">
+        <div class="discord-container">
+            <div class="section-header">
+                <h2>Join Our Community</h2>
+                <p>Connect with 50,000+ members in our Discord server for support, scripts, and updates</p>
+            </div>
+            
+            <div class="discord-widget">
+                <iframe src="https://discord.com/widget?id=123456789012345678&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>Nexus Exec</h3>
+                <p>The most advanced Roblox script executor available, with powerful features and regular updates.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#">Download</a></li>
+                    <li><a href="#">Scripts</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Refund Policy</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Contact</h3>
+                <ul>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">Business Inquiries</a></li>
+                    <li><a href="#">Partnerships</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div>© 2023 Nexus Exec. All rights reserved.</div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Simple theme toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate elements on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.feature-card, .script-card').forEach(card => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.5s ease';
+                observer.observe(card);
+            });
+            
+            // Simple code editor functionality for the demo
+            const codeEditor = document.querySelector('.code-editor');
+            if (codeEditor) {
+                codeEditor.addEventListener('keydown', function(e) {
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        const start = this.selectionStart;
+                        const end = this.selectionEnd;
+                        
+                        this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+                        
+                        this.selectionStart = this.selectionEnd = start + 4;
+                    }
+                });
+            }
+            
+            // Execute button animation
+            const executeBtn = document.querySelector('.executor-btn');
+            if (executeBtn) {
+                executeBtn.addEventListener('click', function() {
+                    this.textContent = 'Executing...';
+                    setTimeout(() => {
+                        this.textContent = 'Success!';
+                        setTimeout(() => {
+                            this.textContent = 'Execute Script';
+                        }, 1500);
+                    }, 1000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
