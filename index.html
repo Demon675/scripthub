@@ -3,722 +3,929 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScriptHub - Roblox Script Sharing</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.6/lottie.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>QuantumStudio | Next-Level Roblox Experiences</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6e45e2;
-            --secondary: #88d3ce;
-            --dark: #1a1a2e;
-            --light: #f1f1f1;
+            --quantum-blue: #00f2fe;
+            --quantum-purple: #4facfe;
+            --neon-pink: #fe00fe;
+            --dark: #0a0a12;
+            --darker: #050508;
+            --light: #f0f8ff;
+            --gray: #6c757d;
+            --danger: #ff3860;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Orbitron', 'Roboto', sans-serif;
         }
-        
+
         body {
-            background-color: var(--dark);
+            background-color: var(--darker);
             color: var(--light);
             overflow-x: hidden;
-            position: relative;
         }
-        
-        #canvas-container {
+
+        /* Quantum Loader Animation */
+        .quantum-loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            opacity: 0.3;
-        }
-        
-        header {
-            background: rgba(26, 26, 46, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
+            background: var(--darker);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 1s ease-out;
         }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo h1 {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
+
+        .quantum-logo {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--quantum-blue), var(--neon-pink));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+            animation: pulse 2s infinite alternate;
         }
-        
-        #lottie-logo {
-            width: 50px;
-            height: 50px;
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 30px rgba(0, 242, 254, 0.6); }
         }
-        
-        nav ul {
-            display: flex;
-            gap: 20px;
-            list-style: none;
-        }
-        
-        nav a {
-            color: var(--light);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-        }
-        
-        nav a:hover {
-            background: rgba(110, 69, 226, 0.3);
-        }
-        
-        .auth-buttons button {
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        .login-btn {
-            background: transparent;
-            color: var(--light);
-            border: 1px solid var(--light);
-            margin-right: 10px;
-        }
-        
-        .register-btn {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: var(--dark);
-        }
-        
-        main {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-        
-        .hero {
-            text-align: center;
-            padding: 4rem 0;
+
+        .loader-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(79, 172, 254, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
             position: relative;
         }
-        
-        .hero h2 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+
+        .loader-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--quantum-blue), var(--neon-pink));
+            animation: loading 2.5s ease-in-out forwards;
         }
-        
-        .hero p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            color: rgba(255, 255, 255, 0.7);
+
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
         }
-        
-        .cta-button {
-            padding: 0.8rem 2.5rem;
-            border-radius: 30px;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: var(--dark);
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
+
+        /* Main Content */
+        .main-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease;
         }
-        
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(110, 69, 226, 0.3);
+
+        /* Login Modal */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            backdrop-filter: blur(5px);
         }
-        
-        #lottie-animation {
-            width: 300px;
-            height: 300px;
-            margin: 0 auto;
-        }
-        
-        /* Upload Form */
-        .upload-container {
-            background: rgba(26, 26, 46, 0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
+
+        .login-box {
+            width: 90%;
+            max-width: 400px;
             padding: 2rem;
-            margin: 3rem auto;
-            max-width: 800px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: rgba(15, 15, 25, 0.95);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.2);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
-        
-        .upload-container h3 {
-            font-size: 1.8rem;
+
+        .login-box.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .login-title {
+            text-align: center;
             margin-bottom: 1.5rem;
-            color: var(--secondary);
+            color: var(--quantum-blue);
+            font-size: 1.8rem;
+            font-weight: 700;
         }
-        
+
         .form-group {
             margin-bottom: 1.5rem;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--light);
+            font-size: 0.9rem;
         }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+
+        .form-control {
             width: 100%;
             padding: 0.8rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(30, 30, 40, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 5px;
             color: var(--light);
-            font-size: 1rem;
-        }
-        
-        .form-group textarea {
-            min-height: 200px;
-            resize: vertical;
-            font-family: monospace;
-        }
-        
-        .submit-btn {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: var(--dark);
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
             font-size: 1rem;
             transition: all 0.3s ease;
         }
-        
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(110, 69, 226, 0.3);
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--quantum-blue);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
         }
-        
-        /* Script List */
-        .scripts-container {
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--quantum-blue), var(--quantum-purple));
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            position: fixed;
+            width: 100%;
+            background: rgba(18, 18, 18, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--quantum-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(90deg, var(--quantum-blue), var(--neon-pink));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .discord-btn {
+            background: #5865F2;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .discord-btn:hover {
+            background: #4752C4;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.05) 0%, rgba(0, 0, 0, 0) 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--quantum-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* Games Section */
+        .section {
+            padding: 5rem 10%;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--quantum-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 2rem;
-            margin: 3rem 0;
         }
-        
-        .script-card {
-            background: rgba(26, 26, 46, 0.6);
-            backdrop-filter: blur(10px);
+
+        .game-card {
+            background: rgba(30, 30, 40, 0.7);
             border-radius: 15px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
             transition: all 0.3s ease;
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            backdrop-filter: blur(5px);
+            transform: translateY(20px);
+            opacity: 0;
         }
-        
-        .script-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+
+        .game-card.visible {
+            transform: translateY(0);
+            opacity: 1;
         }
-        
-        .script-card h4 {
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 242, 254, 0.3);
+        }
+
+        .game-thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+
+        .game-info {
+            padding: 1.5rem;
+        }
+
+        .game-title {
             font-size: 1.3rem;
             margin-bottom: 0.5rem;
-            color: var(--secondary);
+            color: var(--light);
         }
-        
-        .script-card .category {
-            display: inline-block;
-            background: rgba(110, 69, 226, 0.2);
-            color: var(--primary);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-        }
-        
-        .script-card .description {
-            color: rgba(255, 255, 255, 0.7);
+
+        .game-description {
+            color: var(--gray);
             margin-bottom: 1rem;
             font-size: 0.9rem;
+            line-height: 1.5;
         }
-        
-        .tags {
+
+        .game-actions {
             display: flex;
-            flex-wrap: wrap;
             gap: 0.5rem;
-            margin-bottom: 1rem;
         }
-        
-        .tag {
-            background: rgba(136, 211, 206, 0.2);
-            color: var(--secondary);
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-        }
-        
-        .rating {
-            color: gold;
-            margin-bottom: 1rem;
-        }
-        
-        .view-btn {
-            background: transparent;
-            color: var(--secondary);
-            border: 1px solid var(--secondary);
+
+        .play-btn {
+            background: linear-gradient(135deg, var(--quantum-blue), var(--quantum-purple));
+            color: white;
+            border: none;
             padding: 0.5rem 1rem;
-            border-radius: 20px;
+            border-radius: 5px;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
+            flex: 1;
+            text-align: center;
         }
-        
-        .view-btn:hover {
-            background: rgba(136, 211, 206, 0.2);
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.3);
         }
-        
-        /* Login Modal */
-        .modal {
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 36px;
             display: none;
+        }
+
+        .delete-btn:hover {
+            background: #ff1a4a;
+            transform: translateY(-2px);
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .admin-toggle {
+            background: linear-gradient(135deg, var(--quantum-blue), var(--quantum-purple));
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .admin-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .admin-form {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            background: rgba(30, 30, 40, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            backdrop-filter: blur(10px);
+            display: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .admin-form.visible {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .admin-form h3 {
+            margin-bottom: 1rem;
+            color: var(--light);
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        /* Confirm Delete */
+        .confirm-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
+            background: rgba(5, 5, 8, 0.9);
+            display: none;
             align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            backdrop-filter: blur(5px);
         }
-        
-        .modal-content {
-            background: var(--dark);
+
+        .confirm-box {
+            background: rgba(30, 30, 40, 0.95);
             padding: 2rem;
             border-radius: 15px;
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 56, 96, 0.3);
+            text-align: center;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
-        
-        .close-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: var(--light);
+
+        .confirm-box.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .confirm-title {
+            color: var(--danger);
+            margin-bottom: 1rem;
             font-size: 1.5rem;
-            cursor: pointer;
         }
-        
+
+        .confirm-text {
+            color: var(--light);
+            margin-bottom: 2rem;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
         /* Footer */
         footer {
             text-align: center;
-            padding: 2rem;
-            margin-top: 4rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.5);
+            padding: 3rem 2rem;
+            background: rgba(10, 10, 18, 0.9);
+            border-top: 1px solid rgba(0, 242, 254, 0.1);
         }
-        
-        /* Loader */
-        #loader {
-            text-align: center;
-            padding: 2rem;
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
-        
+
+        .social-links a {
+            color: var(--gray);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--quantum-blue);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 1rem;
+            .nav-links {
+                display: none;
             }
             
-            .hero h2 {
-                font-size: 2rem;
+            .hero h1 {
+                font-size: 2.5rem;
             }
             
-            .scripts-container {
+            .games-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .admin-form {
+                width: 300px;
+                right: -50px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Three.js Background -->
-    <div id="canvas-container"></div>
-    
-    <!-- Header -->
-    <header>
-        <div class="logo">
-            <div id="lottie-logo"></div>
-            <h1>ScriptHub</h1>
+    <!-- Quantum Loader Animation -->
+    <div class="quantum-loader" id="quantumLoader">
+        <div class="quantum-logo">QUANTUMSTUDIO</div>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
         </div>
-        <nav>
-            <ul>
-                <li><a href="#scripts">Scripts</a></li>
-                <li><a href="#upload">Upload</a></li>
-                <li><a href="#categories">Kategorien</a></li>
-            </ul>
-        </nav>
-        <div class="auth-buttons">
-            <button class="login-btn" id="login-btn">Login</button>
-            <button class="register-btn" id="register-btn">Registrieren</button>
-        </div>
-    </header>
-    
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section class="hero">
-            <h2>Teile und entdecke Roblox Scripts</h2>
-            <p>Die beste Plattform für hochwertige Roblox-Scripts. Lade deine eigenen Kreationen hoch oder finde nützliche Scripts für deine Lieblingsspiele.</p>
-            <button class="cta-button" id="upload-cta">Jetzt Script hochladen</button>
-            <div id="lottie-animation"></div>
-        </section>
-        <!-- DOKUMENTATION & ANLEITUNG -->
-        <section class="upload-container" style="margin-top:2rem; margin-bottom:2rem;">
-            <h3>Dokumentation & Anleitung</h3>
-            <h4>Schnelleinstieg</h4>
-            <ol>
-                <li><b>Script suchen:</b> Scrolle durch die Script-Liste oder nutze die Kategorien.</li>
-                <li><b>Script anzeigen & kopieren:</b> Klicke auf <i>Script anzeigen</i> bei einem Script. Im Modal kannst du den Lua-Code kopieren.</li>
-                <li><b>Eigenes Script hochladen:</b> Klicke auf <i>Jetzt Script hochladen</i> oder gehe zum Upload-Bereich. Fülle das Formular aus und lade dein Script hoch.</li>
-            </ol>
-            <h4>Feature-Übersicht</h4>
-            <ul>
-                <li><b>Script-Upload:</b> Scripts werden über das Upload-Formular direkt im Browser gespeichert (localStorage).</li>
-                <li><b>Script-Liste:</b> Alle Scripts werden als Karten angezeigt, inkl. Kategorie, Tags, Beschreibung und Bewertung.</li>
-                <li><b>Script anzeigen Modal:</b> Beim Klick auf <i>Script anzeigen</i> öffnet sich ein Modal mit dem vollständigen Lua-Code und Kopierfunktion.</li>
-                <li><b>localStorage:</b> Scripts werden im Browser gespeichert und bleiben auch nach einem Neuladen erhalten.</li>
-                <li><b>Kategorien & Tags:</b> Scripts können nach Kategorie und Tags gefiltert werden (Feature kann erweitert werden).</li>
-                <li><b>Unendliches Scrollen:</b> Beim Scrollen werden automatisch mehr Scripts geladen.</li>
-            </ul>
-            <h4>FAQ & Hinweise</h4>
-            <ul>
-                <li><b>Wo werden meine Scripts gespeichert?</b> Im localStorage deines Browsers. Sie sind nur auf deinem Gerät sichtbar.</li>
-                <li><b>Kann ich Scripts löschen?</b> Aktuell nicht direkt, aber du kannst den localStorage im Browser leeren.</li>
-                <li><b>Wie kann ich Scripts teilen?</b> Kopiere den Lua-Code und teile ihn manuell.</li>
-                <li><b>Wie kann ich Feedback geben?</b> Schreibe uns über das Kontaktformular auf der Hauptseite.</li>
-            </ul>
-        </section>
-        <!-- Upload Form (Initially hidden) -->
-        <section id="upload-form" style="display: none;">
-            <div class="upload-container">
-                <h3>Script hochladen</h3>
-                <form id="script-upload-form">
-                    <div class="form-group">
-                        <label for="title">Titel</label>
-                        <input type="text" id="title" name="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Kategorie</label>
-                        <select id="category" name="category" required>
-                            <option value="">-- Bitte auswählen --</option>
-                            <option value="bloxfruit">Bloxfruit</option>
-                            <option value="autofarm">Autofarm</option>
-                            <option value="pvp">PVP</option>
-                            <option value="gui">GUI</option>
-                            <option value="other">Andere</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="tags">Tags (durch Kommas getrennt)</label>
-                        <input type="text" id="tags" name="tags" placeholder="z.B. autofarm, bloxfruit, pvp">
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Beschreibung</label>
-                        <textarea id="description" name="description" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="code">Script-Code</label>
-                        <textarea id="code" name="code" required></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn">Script hochladen</button>
-                </form>
-            </div>
-        </section>
-        
-        <!-- Scripts List -->
-        <section id="scripts">
-            <h2>Beliebte Scripts</h2>
-            <div class="scripts-container" id="scripts-container">
-                <!-- Script cards will be loaded here -->
-            </div>
-            <div id="loader">Lade mehr Scripts...</div>
-        </section>
-    </main>
-    
-    <!-- Login Modal -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <button class="close-modal" id="close-modal">&times;</button>
-            <h2>Login</h2>
-            <form id="login-form">
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box" id="loginBox">
+            <h2 class="login-title">ADMIN ACCESS</h2>
+            <form id="adminLoginForm">
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="login-email" required>
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Passwort</label>
-                    <input type="password" id="login-password" required>
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" class="form-control" required>
                 </div>
-                <button type="submit" class="submit-btn">Einloggen</button>
+                <button type="submit" class="btn btn-block">AUTHENTICATE</button>
             </form>
         </div>
     </div>
-    
-    <!-- Script-View Modal -->
-    <div class="modal" id="script-view-modal" style="display:none; align-items:center; justify-content:center;">
-        <div class="modal-content" style="max-width:500px; width:90%; position:relative;">
-            <button class="close-modal" id="close-script-modal">&times;</button>
-            <h2>Script-Code</h2>
-            <textarea id="script-view-text" readonly style="width:100%; min-height:150px; margin-bottom:1rem; border-radius:8px; padding:1rem; background:#222; color:#fff; font-family:monospace; font-size:1rem;"></textarea>
-            <button id="copy-script-btn" class="submit-btn" style="width:100%;">Kopieren</button>
+
+    <!-- Confirm Delete Modal -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-box" id="confirmBox">
+            <h3 class="confirm-title">WARNING</h3>
+            <p class="confirm-text">Are you sure you want to delete this game? This action cannot be undone.</p>
+            <div class="confirm-buttons">
+                <button class="btn confirm-delete" id="confirmDelete">DELETE</button>
+                <button class="btn confirm-cancel" id="confirmCancel" style="background: var(--gray);">CANCEL</button>
+            </div>
         </div>
     </div>
-    
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2023 ScriptHub. Alle Rechte vorbehalten.</p>
-    </footer>
-    
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="logo">QuantumStudio</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#games">Games</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <a href="https://discord.gg/an44vaRX" class="discord-btn" target="_blank">
+                <i class="fab fa-discord"></i> Join Discord
+            </a>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1>Creating Quantum Experiences</h1>
+                <p>Welcome to QuantumStudio, where we push the boundaries of Roblox game development with innovative gameplay, stunning visuals, and immersive worlds.</p>
+                <a href="#games" class="btn">Explore Our Games</a>
+            </div>
+        </section>
+
+        <!-- Games Section -->
+        <section class="section" id="games">
+            <h2 class="section-title">Our Quantum Creations</h2>
+            <div class="games-grid" id="gamesContainer">
+                <!-- Games will be added dynamically -->
+            </div>
+        </section>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel">
+            <button class="admin-toggle" id="adminToggle">
+                <i class="fas fa-user-shield"></i>
+            </button>
+            <div class="admin-form" id="adminForm">
+                <h3>Add New Game</h3>
+                <form id="gameForm">
+                    <div class="form-group">
+                        <label for="gameTitle">Game Title</label>
+                        <input type="text" id="gameTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameDescription">Description</label>
+                        <textarea id="gameDescription" class="form-control" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameThumbnail">Thumbnail URL</label>
+                        <input type="text" id="gameThumbnail" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameLink">Quick Join Link</label>
+                        <input type="text" id="gameLink" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-block">Add Game</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="social-links">
+                <a href="https://discord.gg/an44vaRX" target="_blank"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-roblox"></i></a>
+            </div>
+            <p class="copyright">© 2023 QuantumStudio. All rights reserved.</p>
+        </footer>
+    </div>
+
     <script>
-        // Three.js Background Animation
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
-        
-        // Create particles
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particleCount = 1000;
-        
-        const posArray = new Float32Array(particleCount * 3);
-        for(let i = 0; i < particleCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 10;
-        }
-        
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.02,
-            color: 0x6e45e2,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
-        });
-        
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-        
-        camera.position.z = 3;
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            particlesMesh.rotation.x += 0.0005;
-            particlesMesh.rotation.y += 0.0005;
-            
-            renderer.render(scene, camera);
-        }
-        
-        animate();
-        
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-        
-        // Lottie Animations
-        const logoAnim = lottie.loadAnimation({
-            container: document.getElementById('lottie-logo'),
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: 'https://assets5.lottiefiles.com/packages/lf20_5tkzkblw.json' // Replace with your Lottie JSON
-        });
-        
-        const mainAnim = lottie.loadAnimation({
-            container: document.getElementById('lottie-animation'),
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: 'https://assets5.lottiefiles.com/packages/lf20_ix5drqzi.json' // Replace with your Lottie JSON
-        });
-        
-        // Mock Data for Scripts
-        const mockScripts = [
-            {
-                id: 1,
-                title: "Bloxfruit Autofarm",
-                category: "bloxfruit",
-                tags: ["autofarm", "bloxfruit", "efficient"],
-                description: "Ein hochoptimiertes Autofarm-Script für Bloxfruit mit GUI-Einstellungen.",
-                rating: 4.5,
-                code: "-- Hier wäre der Lua-Code"
-            },
-            {
-                id: 2,
-                title: "PVP Aim Assist",
-                category: "pvp",
-                tags: ["pvp", "aimbot", "combat"],
-                description: "Aim-Assist für verbesserte PVP-Kämpfe in verschiedenen Spielen.",
-                rating: 4.2,
-                code: "-- Hier wäre der Lua-Code"
-            }
-        ];
-        
-        // Load Scripts
-        const scriptsContainer = document.getElementById('scripts-container');
-        
-        function loadScripts(scripts) {
-            scripts.forEach(script => {
-                const scriptCard = document.createElement('div');
-                scriptCard.className = 'script-card';
-                const tagsHTML = script.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-                scriptCard.innerHTML = `
-                    <h4>${script.title}</h4>
-                    <span class="category">${script.category}</span>
-                    <p class="description">${script.description}</p>
-                    <div class="tags">${tagsHTML}</div>
-                    <div class="rating">${'★'.repeat(Math.floor(script.rating))}${'☆'.repeat(5 - Math.floor(script.rating))}</div>
-                    <button class="view-btn" data-code="${encodeURIComponent(script.code)}">Script anzeigen</button>
-                `;
-                scriptsContainer.appendChild(scriptCard);
-            });
-        }
-        
-        // Initial load
-        loadScripts(mockScripts);
-        
-        // Infinite Scroll
-        let loading = false;
-        
-        window.addEventListener('scroll', () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !loading) {
-                loading = true;
-                document.getElementById('loader').style.display = 'block';
-                
-                // Simulate API call
+        // Quantum Loader Animation
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('quantumLoader');
+            setTimeout(() => {
+                loader.style.opacity = '0';
                 setTimeout(() => {
-                    loadScripts(mockScripts);
-                    document.getElementById('loader').style.display = 'none';
-                    loading = false;
+                    loader.style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('mainContent').style.opacity = '1';
+                    }, 50);
                 }, 1000);
+            }, 2500);
+        });
+
+        // Admin Credentials
+        const ADMIN_CREDENTIALS = {
+            username: "QuantumAdmin",
+            password: "Q#u@n7uM!2023$eCr3t"
+        };
+
+        // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const loginBox = document.getElementById('loginBox');
+        const adminLoginForm = document.getElementById('adminLoginForm');
+        const adminToggle = document.getElementById('adminToggle');
+        const adminForm = document.getElementById('adminForm');
+        const gameForm = document.getElementById('gameForm');
+        const gamesContainer = document.getElementById('gamesContainer');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmBox = document.getElementById('confirmBox');
+        const confirmDeleteBtn = document.getElementById('confirmDelete');
+        const confirmCancelBtn = document.getElementById('confirmCancel');
+
+        // State
+        let isAdminLoggedIn = localStorage.getItem('quantumAdminAuth') === 'true';
+        let gameToDelete = null;
+
+        // Show Admin Features if logged in
+        if (isAdminLoggedIn) {
+            showAdminFeatures();
+        }
+
+        // Admin Toggle Click
+        adminToggle.addEventListener('click', (e) => {
+            if (!isAdminLoggedIn) {
+                e.preventDefault();
+                showLoginModal();
+            } else {
+                adminForm.classList.toggle('visible');
             }
         });
-        
-        // Upload Form Toggle
-        document.getElementById('upload-cta').addEventListener('click', () => {
-            document.getElementById('upload-form').style.display = 'block';
-            window.scrollTo({
-                top: document.getElementById('upload-form').offsetTop - 100,
-                behavior: 'smooth'
-            });
-        });
-        
-        // Form Submission
-        document.getElementById('script-upload-form').addEventListener('submit', (e) => {
+
+        // Admin Login Form Submission
+        adminLoginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
-            const newScript = {
-                id: Date.now(),
-                title: document.getElementById('title').value,
-                category: document.getElementById('category').value,
-                tags: document.getElementById('tags').value.split(',').map(tag => tag.trim()),
-                description: document.getElementById('description').value,
-                code: document.getElementById('code').value,
-                rating: 0
-            };
-
-            // Scripts aus localStorage laden oder leeres Array erstellen
-            const savedScripts = JSON.parse(localStorage.getItem('scripts') || '[]');
-            savedScripts.push(newScript);
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
             
-            // In localStorage speichern
-            localStorage.setItem('scripts', JSON.stringify(savedScripts));
-            
-            alert('Script gespeichert!');
-            loadScripts([newScript]); // Neu hochgeladenes Script anzeigen
-            e.target.reset();
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                // Successful login
+                isAdminLoggedIn = true;
+                localStorage.setItem('quantumAdminAuth', 'true');
+                hideLoginModal();
+                showAdminFeatures();
+                alert('Quantum Access Granted! Admin features unlocked.');
+            } else {
+                // Failed login
+                loginBox.classList.add('shake');
+                setTimeout(() => {
+                    loginBox.classList.remove('shake');
+                }, 500);
+                alert('Invalid credentials. Quantum access denied.');
+            }
         });
-        
-        // Login Modal
-        const loginModal = document.getElementById('login-modal');
-        
-        document.getElementById('login-btn').addEventListener('click', () => {
+
+        // Game Form Submission
+        gameForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('gameTitle').value;
+            const description = document.getElementById('gameDescription').value;
+            const thumbnail = document.getElementById('gameThumbnail').value;
+            const link = document.getElementById('gameLink').value;
+            
+            addGameToGrid(title, description, thumbnail, link);
+            
+            gameForm.reset();
+            adminForm.classList.remove('visible');
+        });
+
+        // Confirm Delete
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (gameToDelete) {
+                gameToDelete.classList.add('fade-out');
+                setTimeout(() => {
+                    gameToDelete.remove();
+                    gameToDelete = null;
+                    hideConfirmModal();
+                }, 300);
+            }
+        });
+
+        // Cancel Delete
+        confirmCancelBtn.addEventListener('click', hideConfirmModal);
+
+        // Event Delegation for Delete Buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+                const btn = e.target.classList.contains('delete-btn') ? e.target : e.target.closest('.delete-btn');
+                gameToDelete = btn.closest('.game-card');
+                showConfirmModal();
+            }
+        });
+
+        // Functions
+        function showLoginModal() {
             loginModal.style.display = 'flex';
-        });
-        
-        document.getElementById('close-modal').addEventListener('click', () => {
-            loginModal.style.display = 'none';
-        });
-        
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            // Here you would normally authenticate
-            console.log('Login attempt:', email, password);
-            alert('Login erfolgreich!');
-            
-            loginModal.style.display = 'none';
-        });
+            setTimeout(() => {
+                loginBox.classList.add('active');
+            }, 50);
+        }
 
-        // Beim Laden der Seite Scripts aus localStorage holen:
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedScripts = JSON.parse(localStorage.getItem('scripts') || '[]');
-            loadScripts(savedScripts);
-        });
+        function hideLoginModal() {
+            loginBox.classList.remove('active');
+            setTimeout(() => {
+                loginModal.style.display = 'none';
+            }, 300);
+        }
 
-        // Script-View Modal
-        scriptsContainer.addEventListener('click', function(e) {
-            if (e.target.classList.contains('view-btn')) {
-                // Hole den Lua-Code direkt aus dem data-code Attribut
-                const code = decodeURIComponent(e.target.getAttribute('data-code'));
-                document.getElementById('script-view-text').value = code;
-                document.getElementById('script-view-modal').style.display = 'flex';
+        function showConfirmModal() {
+            confirmModal.style.display = 'flex';
+            setTimeout(() => {
+                confirmBox.classList.add('active');
+            }, 50);
+        }
+
+        function hideConfirmModal() {
+            confirmBox.classList.remove('active');
+            setTimeout(() => {
+                confirmModal.style.display = 'none';
+            }, 300);
+        }
+
+        function showAdminFeatures() {
+            // Show delete buttons on all game cards
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.style.display = 'block';
+            });
+            
+            // Enable admin form
+            adminForm.style.display = 'block';
+        }
+
+        function addGameToGrid(title, description, thumbnail, link) {
+            const newGame = document.createElement('div');
+            newGame.className = 'game-card';
+            newGame.innerHTML = `
+                <img src="${thumbnail}" class="game-thumbnail" alt="${title}" onerror="this.src='https://via.placeholder.com/400x200/0a0a12/00f2fe?text=QUANTUMSTUDIO'">
+                <div class="game-info">
+                    <h3 class="game-title">${title}</h3>
+                    <p class="game-description">${description}</p>
+                    <div class="game-actions">
+                        <a href="${link}" class="play-btn" target="_blank">PLAY NOW</a>
+                        <button class="delete-btn" ${isAdminLoggedIn ? '' : 'style="display: none;"'}><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+            
+            gamesContainer.prepend(newGame);
+            
+            setTimeout(() => {
+                newGame.classList.add('visible');
+            }, 10);
+        }
+
+        // Initialize with empty state
+        if (gamesContainer.children.length === 0) {
+            gamesContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--gray);">No games available yet. Check back soon!</p>';
+        }
+
+        // Animate game cards on scroll
+        const animateOnScroll = () => {
+            const gameCards = document.querySelectorAll('.game-card:not(.visible)');
+            gameCards.forEach(card => {
+                const cardPosition = card.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (cardPosition < screenPosition) {
+                    card.classList.add('visible');
+                }
+            });
+        };
+
+        // Initial animation
+        animateOnScroll();
+        
+        // Animate on scroll
+        window.addEventListener('scroll', animateOnScroll);
+
+        // Add fade-out animation style
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .fade-out {
+                animation: fadeOut 0.3s forwards;
             }
-        });
-        document.getElementById('close-script-modal').onclick = function() {
-            document.getElementById('script-view-modal').style.display = 'none';
-        };
-        document.getElementById('copy-script-btn').onclick = function() {
-            const ta = document.getElementById('script-view-text');
-            ta.select();
-            document.execCommand('copy');
-            this.textContent = 'Kopiert!';
-            setTimeout(()=>{ this.textContent = 'Kopieren'; }, 1200);
-        };
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
