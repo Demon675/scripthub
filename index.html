@@ -1,85 +1,51 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Exec | Premium Roblox Script Executor</title>
+    <title>ScriptHub - Roblox Script Sharing</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.6/lottie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         :root {
-            --primary: #5865F2;
-            --secondary: #57F287;
-            --accent: #FEE75C;
-            --dark: #1e1e2d;
-            --darker: #12121a;
-            --text: #f0f0f5;
+            --primary: #6e45e2;
+            --secondary: #88d3ce;
+            --dark: #1a1a2e;
+            --light: #f1f1f1;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
         
         body {
-            background: var(--darker);
-            color: var(--text);
+            background-color: var(--dark);
+            color: var(--light);
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(88, 101, 242, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(87, 242, 135, 0.15) 0%, transparent 50%);
+            position: relative;
         }
         
-        /* Glowing animated background elements */
-        .bg-blur {
+        #canvas-container {
             position: fixed;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.3;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: -1;
-            animation: float 15s infinite ease-in-out;
+            opacity: 0.3;
         }
         
-        .bg-blur:nth-child(1) {
-            background: var(--primary);
-            top: -100px;
-            left: -100px;
-            animation-delay: 0s;
-        }
-        
-        .bg-blur:nth-child(2) {
-            background: var(--secondary);
-            bottom: -100px;
-            right: -100px;
-            animation-delay: 3s;
-        }
-        
-        .bg-blur:nth-child(3) {
-            background: var(--accent);
-            top: 50%;
-            right: -150px;
-            animation-delay: 6s;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(20px, 30px); }
-        }
-        
-        /* Navigation */
-        nav {
+        header {
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 5%;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-            background: rgba(30, 30, 45, 0.8);
-            backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
@@ -87,112 +53,76 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .logo h1 {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            font-size: 1.8rem;
         }
         
-        .logo img {
-            width: 40px;
-            height: 40px;
+        #lottie-logo {
+            width: 50px;
+            height: 50px;
         }
         
-        .nav-links {
+        nav ul {
             display: flex;
-            gap: 30px;
+            gap: 20px;
+            list-style: none;
         }
         
-        .nav-links a {
-            color: var(--text);
+        nav a {
+            color: var(--light);
             text-decoration: none;
-            font-weight: 500;
-            position: relative;
             transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
         }
         
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
+        nav a:hover {
+            background: rgba(110, 69, 226, 0.3);
         }
         
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-        
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-        
-        .auth-buttons {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .auth-buttons button {
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
             border: none;
-            outline: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
         
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #4752c4;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
-        }
-        
-        .btn-outline {
+        .login-btn {
             background: transparent;
-            color: var(--text);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--light);
+            border: 1px solid var(--light);
+            margin-right: 10px;
         }
         
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
+        .register-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--dark);
         }
         
-        /* Hero Section */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
         .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 0 5%;
-            padding-top: 100px;
+            text-align: center;
+            padding: 4rem 0;
             position: relative;
-            overflow: hidden;
         }
         
-        .hero-content {
-            max-width: 600px;
-            z-index: 2;
-        }
-        
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-        
-        .hero h1 span {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -200,851 +130,595 @@
         
         .hero p {
             font-size: 1.2rem;
-            margin-bottom: 30px;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-        
-        .stats {
-            display: flex;
-            gap: 30px;
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        
-        .hero-image {
-            position: absolute;
-            right: 5%;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 500px;
-            height: 500px;
-            background: url('https://i.imgur.com/JXQ2hQy.png') no-repeat center center;
-            background-size: contain;
-            z-index: 1;
-            animation: float 6s infinite ease-in-out;
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 100px 5%;
-            background: rgba(30, 30, 45, 0.5);
-            position: relative;
-        }
-        
-        .section-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-        
-        .section-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-        
-        .section-header p {
             max-width: 700px;
-            margin: 0 auto;
-            opacity: 0.8;
-            line-height: 1.6;
+            margin: 0 auto 2rem;
+            color: rgba(255, 255, 255, 0.7);
         }
         
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 30px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.2);
-        }
-        
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        
-        .feature-icon i {
-            font-size: 1.5rem;
-            color: white;
-        }
-        
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
-        
-        .feature-card p {
-            opacity: 0.8;
-            line-height: 1.6;
-        }
-        
-        /* Executor Section */
-        .executor {
-            padding: 100px 5%;
-            position: relative;
-        }
-        
-        .executor-container {
-            display: flex;
-            gap: 50px;
-            align-items: center;
-        }
-        
-        .executor-content {
-            flex: 1;
-        }
-        
-        .executor-image {
-            flex: 1;
-            position: relative;
-            min-height: 500px;
-        }
-        
-        .executor-window {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: #1e1e2d;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-        }
-        
-        .executor-header {
-            height: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .executor-dots {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        
-        .dot-red {
-            background: #ff5f56;
-        }
-        
-        .dot-yellow {
-            background: #ffbd2e;
-        }
-        
-        .dot-green {
-            background: #27c93f;
-        }
-        
-        .executor-title {
-            margin-left: 15px;
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-        
-        .executor-body {
-            padding: 20px;
-            height: calc(100% - 40px);
-        }
-        
-        .code-editor {
-            width: 100%;
-            height: 100%;
-            background: #1e1e2d;
+        .cta-button {
+            padding: 0.8rem 2.5rem;
+            border-radius: 30px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--dark);
             border: none;
-            color: #f0f0f5;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            resize: none;
-            outline: none;
-        }
-        
-        .executor-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 15px;
-            background: rgba(88, 101, 242, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .executor-btn {
-            background: var(--primary);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(110, 69, 226, 0.3);
+        }
+        
+        #lottie-animation {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        
+        /* Upload Form */
+        .upload-container {
+            background: rgba(26, 26, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem auto;
+            max-width: 800px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .upload-container h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--dark);
+            padding: 0.8rem 2rem;
             border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
         
-        .executor-btn:hover {
-            background: #4752c4;
+        .submit-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(110, 69, 226, 0.3);
         }
         
-        /* Scripts Section */
-        .scripts {
-            padding: 100px 5%;
-            background: rgba(30, 30, 45, 0.5);
-        }
-        
-        .scripts-grid {
+        /* Script List */
+        .scripts-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
         }
         
         .script-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(26, 26, 46, 0.6);
+            backdrop-filter: blur(10px);
             border-radius: 15px;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            padding: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
         
         .script-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
         
-        .script-thumbnail {
-            height: 150px;
-            background: linear-gradient(135deg, #5865F2, #57F287);
-            position: relative;
-            overflow: hidden;
+        .script-card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
         }
         
-        .script-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .script-card .category {
+            display: inline-block;
+            background: rgba(110, 69, 226, 0.2);
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
         }
         
-        .script-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 3px 10px;
+        .script-card .description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tag {
+            background: rgba(136, 211, 206, 0.2);
+            color: var(--secondary);
+            padding: 0.2rem 0.6rem;
             border-radius: 20px;
             font-size: 0.7rem;
-            font-weight: 600;
         }
         
-        .script-content {
-            padding: 20px;
+        .rating {
+            color: gold;
+            margin-bottom: 1rem;
         }
         
-        .script-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
+        .view-btn {
+            background: transparent;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .script-author {
-            display: flex;
+        .view-btn:hover {
+            background: rgba(136, 211, 206, 0.2);
+        }
+        
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            opacity: 0.8;
         }
         
-        .script-author img {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-        }
-        
-        .script-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
-        
-        .script-stats span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        /* Discord Section */
-        .discord {
-            padding: 100px 5%;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .discord-container {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .discord-widget {
-            margin-top: 50px;
-            background: rgba(255, 255, 255, 0.05);
+        .modal-content {
+            background: var(--dark);
+            padding: 2rem;
             border-radius: 15px;
-            padding: 30px;
-            display: inline-block;
+            width: 100%;
+            max-width: 400px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            position: relative;
         }
         
-        .discord-widget iframe {
-            border-radius: 10px;
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
             border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
         }
         
         /* Footer */
         footer {
-            background: #12121a;
-            padding: 50px 5%;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
         }
         
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-col h3 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--primary);
-        }
-        
-        .footer-col ul {
-            list-style: none;
-        }
-        
-        .footer-col ul li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-col ul li a {
-            color: var(--text);
-            text-decoration: none;
-            opacity: 0.8;
-            transition: all 0.3s ease;
-        }
-        
-        .footer-col ul li a:hover {
-            opacity: 1;
-            color: var(--primary);
-        }
-        
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .social-links a {
-            color: var(--text);
-            opacity: 0.8;
-            transition: all 0.3s ease;
-        }
-        
-        .social-links a:hover {
-            opacity: 1;
-            color: var(--primary);
+        /* Loader */
+        #loader {
+            text-align: center;
+            padding: 2rem;
         }
         
         /* Responsive */
-        @media (max-width: 1024px) {
-            .hero-image {
-                opacity: 0.3;
-                right: -100px;
-            }
-            
-            .executor-container {
-                flex-direction: column;
-            }
-        }
-        
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero-buttons {
+            header {
                 flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .scripts-container {
+                grid-template-columns: 1fr;
             }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Animated Background Elements -->
-    <div class="bg-blur"></div>
-    <div class="bg-blur"></div>
-    <div class="bg-blur"></div>
+    <!-- Three.js Background -->
+    <div id="canvas-container"></div>
     
-    <!-- Navigation -->
-    <nav>
+    <!-- Header -->
+    <header>
         <div class="logo">
-            <img src="https://i.imgur.com/JXQ2hQy.png" alt="Nexus Logo">
-            <span>Nexus Exec</span>
+            <div id="lottie-logo"></div>
+            <h1>ScriptHub</h1>
         </div>
-        
-        <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#executor">Executor</a>
-            <a href="#scripts">Scripts</a>
-            <a href="#discord">Discord</a>
-        </div>
-        
+        <nav>
+            <ul>
+                <li><a href="#scripts">Scripts</a></li>
+                <li><a href="#upload">Upload</a></li>
+                <li><a href="#categories">Kategorien</a></li>
+            </ul>
+        </nav>
         <div class="auth-buttons">
-            <button class="btn btn-outline">Login</button>
-            <button class="btn btn-primary">Download</button>
+            <button class="login-btn" id="login-btn">Login</button>
+            <button class="register-btn" id="register-btn">Registrieren</button>
         </div>
-    </nav>
+    </header>
     
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>The Most Powerful <span>Roblox Executor</span> Ever Created</h1>
-            <p>Nexus Exec offers unparalleled performance, security, and features for all your Roblox scripting needs. Join over 500,000 users worldwide.</p>
-            
-            <div class="hero-buttons">
-                <button class="btn btn-primary">Download Now</button>
-                <button class="btn btn-outline">View Scripts</button>
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Teile und entdecke Roblox Scripts</h2>
+            <p>Die beste Plattform für hochwertige Roblox-Scripts. Lade deine eigenen Kreationen hoch oder finde nützliche Scripts für deine Lieblingsspiele.</p>
+            <button class="cta-button" id="upload-cta">Jetzt Script hochladen</button>
+            <div id="lottie-animation"></div>
+        </section>
+        <!-- DOKUMENTATION & ANLEITUNG -->
+        <section class="upload-container" style="margin-top:2rem; margin-bottom:2rem;">
+            <h3>Dokumentation & Anleitung</h3>
+            <h4>Schnelleinstieg</h4>
+            <ol>
+                <li><b>Script suchen:</b> Scrolle durch die Script-Liste oder nutze die Kategorien.</li>
+                <li><b>Script anzeigen & kopieren:</b> Klicke auf <i>Script anzeigen</i> bei einem Script. Im Modal kannst du den Lua-Code kopieren.</li>
+                <li><b>Eigenes Script hochladen:</b> Klicke auf <i>Jetzt Script hochladen</i> oder gehe zum Upload-Bereich. Fülle das Formular aus und lade dein Script hoch.</li>
+            </ol>
+            <h4>Feature-Übersicht</h4>
+            <ul>
+                <li><b>Script-Upload:</b> Scripts werden über das Upload-Formular direkt im Browser gespeichert (localStorage).</li>
+                <li><b>Script-Liste:</b> Alle Scripts werden als Karten angezeigt, inkl. Kategorie, Tags, Beschreibung und Bewertung.</li>
+                <li><b>Script anzeigen Modal:</b> Beim Klick auf <i>Script anzeigen</i> öffnet sich ein Modal mit dem vollständigen Lua-Code und Kopierfunktion.</li>
+                <li><b>localStorage:</b> Scripts werden im Browser gespeichert und bleiben auch nach einem Neuladen erhalten.</li>
+                <li><b>Kategorien & Tags:</b> Scripts können nach Kategorie und Tags gefiltert werden (Feature kann erweitert werden).</li>
+                <li><b>Unendliches Scrollen:</b> Beim Scrollen werden automatisch mehr Scripts geladen.</li>
+            </ul>
+            <h4>FAQ & Hinweise</h4>
+            <ul>
+                <li><b>Wo werden meine Scripts gespeichert?</b> Im localStorage deines Browsers. Sie sind nur auf deinem Gerät sichtbar.</li>
+                <li><b>Kann ich Scripts löschen?</b> Aktuell nicht direkt, aber du kannst den localStorage im Browser leeren.</li>
+                <li><b>Wie kann ich Scripts teilen?</b> Kopiere den Lua-Code und teile ihn manuell.</li>
+                <li><b>Wie kann ich Feedback geben?</b> Schreibe uns über das Kontaktformular auf der Hauptseite.</li>
+            </ul>
+        </section>
+        <!-- Upload Form (Initially hidden) -->
+        <section id="upload-form" style="display: none;">
+            <div class="upload-container">
+                <h3>Script hochladen</h3>
+                <form id="script-upload-form">
+                    <div class="form-group">
+                        <label for="title">Titel</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Kategorie</label>
+                        <select id="category" name="category" required>
+                            <option value="">-- Bitte auswählen --</option>
+                            <option value="bloxfruit">Bloxfruit</option>
+                            <option value="autofarm">Autofarm</option>
+                            <option value="pvp">PVP</option>
+                            <option value="gui">GUI</option>
+                            <option value="other">Andere</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tags">Tags (durch Kommas getrennt)</label>
+                        <input type="text" id="tags" name="tags" placeholder="z.B. autofarm, bloxfruit, pvp">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Beschreibung</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="code">Script-Code</label>
+                        <textarea id="code" name="code" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Script hochladen</button>
+                </form>
             </div>
-            
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-number">500K+</span>
-                    <span class="stat-label">Users</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">10K+</span>
-                    <span class="stat-label">Scripts</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">99.9%</span>
-                    <span class="stat-label">Uptime</span>
-                </div>
-            </div>
-        </div>
+        </section>
         
-        <div class="hero-image"></div>
-    </section>
+        <!-- Scripts List -->
+        <section id="scripts">
+            <h2>Beliebte Scripts</h2>
+            <div class="scripts-container" id="scripts-container">
+                <!-- Script cards will be loaded here -->
+            </div>
+            <div id="loader">Lade mehr Scripts...</div>
+        </section>
+    </main>
     
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="section-header">
-            <h2>Premium Features</h2>
-            <p>Nexus Exec comes packed with powerful features to enhance your Roblox experience</p>
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal">&times;</button>
+            <h2>Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Passwort</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="submit-btn">Einloggen</button>
+            </form>
         </div>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <h3>Lightning Fast</h3>
-                <p>Our custom engine executes scripts faster than any other executor available, with near-zero injection time.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3>Undetected</h3>
-                <p>Advanced anti-ban systems ensure you stay safe while using our executor in your favorite games.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-upload"></i>
-                </div>
-                <h3>Script Hub</h3>
-                <p>Access thousands of community-made scripts directly from our built-in script hub with one-click execution.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-palette"></i>
-                </div>
-                <h3>Custom UI</h3>
-                <p>Fully customizable interface with themes, layouts, and personalization options to suit your style.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-code"></i>
-                </div>
-                <h3>Lua Editor</h3>
-                <p>Built-in advanced Lua editor with syntax highlighting, auto-completion, and error checking.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-sync-alt"></i>
-                </div>
-                <h3>Auto Updates</h3>
-                <p>Regular updates with new features and bypasses to ensure compatibility with the latest Roblox versions.</p>
-            </div>
-        </div>
-    </section>
+    </div>
     
-    <!-- Executor Section -->
-    <section class="executor" id="executor">
-        <div class="section-header">
-            <h2>Powerful In-App Executor</h2>
-            <p>Experience the most advanced script execution environment ever created for Roblox</p>
+    <!-- Script-View Modal -->
+    <div class="modal" id="script-view-modal" style="display:none; align-items:center; justify-content:center;">
+        <div class="modal-content" style="max-width:500px; width:90%; position:relative;">
+            <button class="close-modal" id="close-script-modal">&times;</button>
+            <h2>Script-Code</h2>
+            <textarea id="script-view-text" readonly style="width:100%; min-height:150px; margin-bottom:1rem; border-radius:8px; padding:1rem; background:#222; color:#fff; font-family:monospace; font-size:1rem;"></textarea>
+            <button id="copy-script-btn" class="submit-btn" style="width:100%;">Kopieren</button>
         </div>
-        
-        <div class="executor-container">
-            <div class="executor-content">
-                <h3>Next-Generation Script Execution</h3>
-                <p>Our executor features a complete Lua environment with debugging tools, script saving, and direct access to our script database.</p>
-                
-                <div style="margin-top: 30px;">
-                    <h4>Key Benefits:</h4>
-                    <ul style="margin-top: 15px; list-style: none;">
-                        <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
-                            <span>Multi-threaded script execution</span>
-                        </li>
-                        <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
-                            <span>Built-in script organizer</span>
-                        </li>
-                        <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
-                            <span>Auto-save and version history</span>
-                        </li>
-                        <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
-                            <span>Direct script sharing to Discord</span>
-                        </li>
-                    </ul>
-                </div>
-                
-                <button class="btn btn-primary" style="margin-top: 30px;">Get Started</button>
-            </div>
-            
-            <div class="executor-image">
-                <div class="executor-window">
-                    <div class="executor-header">
-                        <div class="executor-dots">
-                            <div class="dot dot-red"></div>
-                            <div class="dot dot-yellow"></div>
-                            <div class="dot dot-green"></div>
-                        </div>
-                        <div class="executor-title">script.lua - Nexus Exec</div>
-                    </div>
-                    <div class="executor-body">
-                        <textarea class="code-editor" spellcheck="false">-- Welcome to Nexus Exec!
--- Try this simple script:
-
-local player = game:GetService("Players").LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-
-if character then
-    local humanoid = character:WaitForChild("Humanoid")
-    
-    -- Super jump script
-    humanoid.JumpPower = 100
-    
-    -- Fly script
-    local flyEnabled = false
-    local bodyVelocity = Instance.new("BodyVelocity", character.HumanoidRootPart)
-    
-    game:GetService("UserInputService").InputBegan:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.F then
-            flyEnabled = not flyEnabled
-            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        end
-    end)
-    
-    game:GetService("RunService").Heartbeat:Connect(function()
-        if flyEnabled then
-            bodyVelocity.Velocity = Vector3.new(0, 10, 0)
-        end
-    end)
-end
-
-print("Script executed successfully!")</textarea>
-                    </div>
-                    <div class="executor-footer">
-                        <div>Line 25, Column 12</div>
-                        <button class="executor-btn">Execute Script</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Scripts Section -->
-    <section class="scripts" id="scripts">
-        <div class="section-header">
-            <h2>Popular Scripts</h2>
-            <p>Browse our collection of the most popular community scripts</p>
-        </div>
-        
-        <div class="scripts-grid">
-            <div class="script-card">
-                <div class="script-thumbnail">
-                    <img src="https://i.imgur.com/JXQ2hQy.png" alt="Script Thumbnail">
-                    <div class="script-badge">Featured</div>
-                </div>
-                <div class="script-content">
-                    <h3 class="script-title">Infinite Yield</h3>
-                    <div class="script-author">
-                        <img src="https://i.imgur.com/JXQ2hQy.png" alt="Author">
-                        <span>Edge</span>
-                    </div>
-                    <div class="script-stats">
-                        <span><i class="fas fa-download"></i> 50K+</span>
-                        <span><i class="fas fa-thumbs-up"></i> 98%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="script-card">
-                <div class="script-thumbnail">
-                    <img src="https://i.imgur.com/JXQ2hQy.png" alt="Script Thumbnail">
-                    <div class="script-badge">New</div>
-                </div>
-                <div class="script-content">
-                    <h3 class="script-title">Dark Dex</h3>
-                    <div class="script-author">
-                        <img src="https://i.imgur.com/JXQ2hQy.png" alt="Author">
-                        <span>BrickMan</span>
-                    </div>
-                    <div class="script-stats">
-                        <span><i class="fas fa-download"></i> 25K+</span>
-                        <span><i class="fas fa-thumbs-up"></i> 95%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="script-card">
-                <div class="script-thumbnail">
-                    <img src="https://i.imgur.com/JXQ2hQy.png" alt="Script Thumbnail">
-                    <div class="script-badge">Popular</div>
-                </div>
-                <div class="script-content">
-                    <h3 class="script-title">Owl Hub</h3>
-                    <div class="script-author">
-                        <img src="https://i.imgur.com/JXQ2hQy.png" alt="Author">
-                        <span>Owl</span>
-                    </div>
-                    <div class="script-stats">
-                        <span><i class="fas fa-download"></i> 40K+</span>
-                        <span><i class="fas fa-thumbs-up"></i> 97%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="script-card">
-                <div class="script-thumbnail">
-                    <img src="https://i.imgur.com/JXQ2hQy.png" alt="Script Thumbnail">
-                </div>
-                <div class="script-content">
-                    <h3 class="script-title">Fates Admin</h3>
-                    <div class="script-author">
-                        <img src="https://i.imgur.com/JXQ2hQy.png" alt="Author">
-                        <span>Fate</span>
-                    </div>
-                    <div class="script-stats">
-                        <span><i class="fas fa-download"></i> 35K+</span>
-                        <span><i class="fas fa-thumbs-up"></i> 96%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin-top: 50px;">
-            <button class="btn btn-primary">Browse All Scripts</button>
-        </div>
-    </section>
-    
-    <!-- Discord Section -->
-    <section class="discord" id="discord">
-        <div class="discord-container">
-            <div class="section-header">
-                <h2>Join Our Community</h2>
-                <p>Connect with 50,000+ members in our Discord server for support, scripts, and updates</p>
-            </div>
-            
-            <div class="discord-widget">
-                <iframe src="https://discord.com/widget?id=123456789012345678&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-            </div>
-        </div>
-    </section>
+    </div>
     
     <!-- Footer -->
     <footer>
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h3>Nexus Exec</h3>
-                <p>The most advanced Roblox script executor available, with powerful features and regular updates.</p>
-            </div>
-            
-            <div class="footer-col">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="#">Download</a></li>
-                    <li><a href="#">Scripts</a></li>
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">FAQ</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-col">
-                <h3>Legal</h3>
-                <ul>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Refund Policy</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-col">
-                <h3>Contact</h3>
-                <ul>
-                    <li><a href="#">Support</a></li>
-                    <li><a href="#">Business Inquiries</a></li>
-                    <li><a href="#">Partnerships</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <div>© 2023 Nexus Exec. All rights reserved.</div>
-            <div class="social-links">
-                <a href="#"><i class="fab fa-discord"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-youtube"></i></a>
-            </div>
-        </div>
+        <p>&copy; 2023 ScriptHub. Alle Rechte vorbehalten.</p>
     </footer>
     
     <script>
-        // Simple theme toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate elements on scroll
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = 1;
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, { threshold: 0.1 });
+        // Three.js Background Animation
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+        
+        // Create particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particleCount = 1000;
+        
+        const posArray = new Float32Array(particleCount * 3);
+        for(let i = 0; i < particleCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 10;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0x6e45e2,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        camera.position.z = 3;
+        
+        function animate() {
+            requestAnimationFrame(animate);
             
-            document.querySelectorAll('.feature-card, .script-card').forEach(card => {
-                card.style.opacity = 0;
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.5s ease';
-                observer.observe(card);
-            });
+            particlesMesh.rotation.x += 0.0005;
+            particlesMesh.rotation.y += 0.0005;
             
-            // Simple code editor functionality for the demo
-            const codeEditor = document.querySelector('.code-editor');
-            if (codeEditor) {
-                codeEditor.addEventListener('keydown', function(e) {
-                    if (e.key === 'Tab') {
-                        e.preventDefault();
-                        const start = this.selectionStart;
-                        const end = this.selectionEnd;
-                        
-                        this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
-                        
-                        this.selectionStart = this.selectionEnd = start + 4;
-                    }
-                });
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Lottie Animations
+        const logoAnim = lottie.loadAnimation({
+            container: document.getElementById('lottie-logo'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'https://assets5.lottiefiles.com/packages/lf20_5tkzkblw.json' // Replace with your Lottie JSON
+        });
+        
+        const mainAnim = lottie.loadAnimation({
+            container: document.getElementById('lottie-animation'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'https://assets5.lottiefiles.com/packages/lf20_ix5drqzi.json' // Replace with your Lottie JSON
+        });
+        
+        // Mock Data for Scripts
+        const mockScripts = [
+            {
+                id: 1,
+                title: "Bloxfruit Autofarm",
+                category: "bloxfruit",
+                tags: ["autofarm", "bloxfruit", "efficient"],
+                description: "Ein hochoptimiertes Autofarm-Script für Bloxfruit mit GUI-Einstellungen.",
+                rating: 4.5,
+                code: "-- Hier wäre der Lua-Code"
+            },
+            {
+                id: 2,
+                title: "PVP Aim Assist",
+                category: "pvp",
+                tags: ["pvp", "aimbot", "combat"],
+                description: "Aim-Assist für verbesserte PVP-Kämpfe in verschiedenen Spielen.",
+                rating: 4.2,
+                code: "-- Hier wäre der Lua-Code"
             }
-            
-            // Execute button animation
-            const executeBtn = document.querySelector('.executor-btn');
-            if (executeBtn) {
-                executeBtn.addEventListener('click', function() {
-                    this.textContent = 'Executing...';
-                    setTimeout(() => {
-                        this.textContent = 'Success!';
-                        setTimeout(() => {
-                            this.textContent = 'Execute Script';
-                        }, 1500);
-                    }, 1000);
-                });
+        ];
+        
+        // Load Scripts
+        const scriptsContainer = document.getElementById('scripts-container');
+        
+        function loadScripts(scripts) {
+            scripts.forEach(script => {
+                const scriptCard = document.createElement('div');
+                scriptCard.className = 'script-card';
+                const tagsHTML = script.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                scriptCard.innerHTML = `
+                    <h4>${script.title}</h4>
+                    <span class="category">${script.category}</span>
+                    <p class="description">${script.description}</p>
+                    <div class="tags">${tagsHTML}</div>
+                    <div class="rating">${'★'.repeat(Math.floor(script.rating))}${'☆'.repeat(5 - Math.floor(script.rating))}</div>
+                    <button class="view-btn" data-code="${encodeURIComponent(script.code)}">Script anzeigen</button>
+                `;
+                scriptsContainer.appendChild(scriptCard);
+            });
+        }
+        
+        // Initial load
+        loadScripts(mockScripts);
+        
+        // Infinite Scroll
+        let loading = false;
+        
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !loading) {
+                loading = true;
+                document.getElementById('loader').style.display = 'block';
+                
+                // Simulate API call
+                setTimeout(() => {
+                    loadScripts(mockScripts);
+                    document.getElementById('loader').style.display = 'none';
+                    loading = false;
+                }, 1000);
             }
         });
+        
+        // Upload Form Toggle
+        document.getElementById('upload-cta').addEventListener('click', () => {
+            document.getElementById('upload-form').style.display = 'block';
+            window.scrollTo({
+                top: document.getElementById('upload-form').offsetTop - 100,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Form Submission
+        document.getElementById('script-upload-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newScript = {
+                id: Date.now(),
+                title: document.getElementById('title').value,
+                category: document.getElementById('category').value,
+                tags: document.getElementById('tags').value.split(',').map(tag => tag.trim()),
+                description: document.getElementById('description').value,
+                code: document.getElementById('code').value,
+                rating: 0
+            };
+
+            // Scripts aus localStorage laden oder leeres Array erstellen
+            const savedScripts = JSON.parse(localStorage.getItem('scripts') || '[]');
+            savedScripts.push(newScript);
+            
+            // In localStorage speichern
+            localStorage.setItem('scripts', JSON.stringify(savedScripts));
+            
+            alert('Script gespeichert!');
+            loadScripts([newScript]); // Neu hochgeladenes Script anzeigen
+            e.target.reset();
+        });
+        
+        // Login Modal
+        const loginModal = document.getElementById('login-modal');
+        
+        document.getElementById('login-btn').addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+        
+        document.getElementById('close-modal').addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+        
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Here you would normally authenticate
+            console.log('Login attempt:', email, password);
+            alert('Login erfolgreich!');
+            
+            loginModal.style.display = 'none';
+        });
+
+        // Beim Laden der Seite Scripts aus localStorage holen:
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedScripts = JSON.parse(localStorage.getItem('scripts') || '[]');
+            loadScripts(savedScripts);
+        });
+
+        // Script-View Modal
+        scriptsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('view-btn')) {
+                // Hole den Lua-Code direkt aus dem data-code Attribut
+                const code = decodeURIComponent(e.target.getAttribute('data-code'));
+                document.getElementById('script-view-text').value = code;
+                document.getElementById('script-view-modal').style.display = 'flex';
+            }
+        });
+        document.getElementById('close-script-modal').onclick = function() {
+            document.getElementById('script-view-modal').style.display = 'none';
+        };
+        document.getElementById('copy-script-btn').onclick = function() {
+            const ta = document.getElementById('script-view-text');
+            ta.select();
+            document.execCommand('copy');
+            this.textContent = 'Kopiert!';
+            setTimeout(()=>{ this.textContent = 'Kopieren'; }, 1200);
+        };
     </script>
 </body>
 </html>
