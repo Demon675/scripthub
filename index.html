@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumStudio | Next-Level Roblox Experiences</title>
+    <title>QuantumStudio | Permanent Game Storage</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -260,6 +260,32 @@
             transform: translateY(-2px);
         }
 
+        /* Admin Login Button */
+        .admin-login-btn {
+            padding: 0.6rem 1.2rem;
+            margin-left: 1rem;
+            background: linear-gradient(135deg, var(--neon-pink), var(--quantum-purple));
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .admin-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(254, 0, 254, 0.3);
+        }
+
+        .admin-login-btn i {
+            margin-right: 0.5rem;
+        }
+
         /* Hero Section */
         .hero {
             height: 100vh;
@@ -431,7 +457,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
@@ -647,9 +673,14 @@
                 <a href="#about">About</a>
                 <a href="#contact">Contact</a>
             </div>
-            <a href="https://discord.gg/an44vaRX" class="discord-btn" target="_blank">
-                <i class="fab fa-discord"></i> Join Discord
-            </a>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="#" class="admin-login-btn" id="adminLoginBtn">
+                    <i class="fas fa-user-shield"></i> Admin
+                </a>
+                <a href="https://discord.gg/an44vaRX" class="discord-btn" target="_blank">
+                    <i class="fab fa-discord"></i> Join Discord
+                </a>
+            </div>
         </nav>
 
         <!-- Hero Section -->
@@ -701,7 +732,7 @@
         <!-- Footer -->
         <footer>
             <div class="social-links">
-                <a href="https://discord.gg/an44vaRX" target="_blank"><i class="fab fa-discord"></i></a>
+                <a href="https://discord.gg/an44vaRX" target="_blank" class="discord-link"><i class="fab fa-discord"></i></a>
                 <a href="#"><i class="fab fa-twitter"></i></a>
                 <a href="#"><i class="fab fa-youtube"></i></a>
                 <a href="#"><i class="fab fa-roblox"></i></a>
@@ -711,6 +742,255 @@
     </div>
 
     <script>
+        // Quantum Game Database (localStorage)
+        const QuantumDB = {
+            // Load games from localStorage
+            loadGames: () => {
+                const games = localStorage.getItem('quantum_games');
+                return games ? JSON.parse(games) : [];
+            },
+            
+            // Save games to localStorage
+            saveGames: (games) => {
+                localStorage.setItem('quantum_games', JSON.stringify(games));
+            },
+            
+            // Add new game
+            addGame: (game) => {
+                const games = QuantumDB.loadGames();
+                games.unshift(game); // Newest game first
+                QuantumDB.saveGames(games);
+            },
+            
+            // Delete game
+            deleteGame: (gameId) => {
+                let games = QuantumDB.loadGames();
+                games = games.filter(game => game.id !== gameId);
+                QuantumDB.saveGames(games);
+            }
+        };
+
+        // Admin Credentials
+        const ADMIN_CREDENTIALS = {
+            username: "QuantumAdmin",
+            password: "Q#u@n7uM!2023$eCr3t"
+        };
+
+        // On page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load and display games
+            const games = QuantumDB.loadGames();
+            renderGames(games);
+            
+            // Check admin login status
+            if (localStorage.getItem('quantum_admin_logged_in') === 'true') {
+                showAdminFeatures();
+            } else {
+                document.getElementById('adminLoginBtn').style.display = 'flex';
+            }
+            
+            // Initialize animations
+            animateOnScroll();
+        });
+
+        // Render games to the page
+        function renderGames(games) {
+            const container = document.getElementById('gamesContainer');
+            
+            if (games.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--gray);">No games available yet. Check back soon!</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            games.forEach(game => {
+                const gameElement = document.createElement('div');
+                gameElement.className = 'game-card';
+                gameElement.dataset.id = game.id;
+                gameElement.innerHTML = `
+                    <img src="${game.thumbnail}" class="game-thumbnail" alt="${game.title}" onerror="this.src='https://via.placeholder.com/400x200/0a0a12/00f2fe?text=QUANTUMSTUDIO'">
+                    <div class="game-info">
+                        <h3 class="game-title">${game.title}</h3>
+                        <p class="game-description">${game.description}</p>
+                        <div class="game-actions">
+                            <a href="${game.link}" class="play-btn" target="_blank">PLAY NOW</a>
+                            <button class="delete-btn" ${localStorage.getItem('quantum_admin_logged_in') === 'true' ? '' : 'style="display: none;"'}>
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(gameElement);
+            });
+            
+            // Animate cards
+            setTimeout(() => {
+                document.querySelectorAll('.game-card').forEach(card => {
+                    card.classList.add('visible');
+                });
+            }, 100);
+        }
+
+        // Add new game
+        document.getElementById('gameForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newGame = {
+                id: Date.now().toString(),
+                title: document.getElementById('gameTitle').value,
+                description: document.getElementById('gameDescription').value,
+                thumbnail: document.getElementById('gameThumbnail').value,
+                link: document.getElementById('gameLink').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            QuantumDB.addGame(newGame);
+            renderGames(QuantumDB.loadGames());
+            
+            // Reset form
+            e.target.reset();
+            document.getElementById('adminForm').classList.remove('visible');
+            
+            // Success message
+            alert('Game added successfully!');
+        });
+
+        // Delete game
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+                const gameCard = e.target.closest('.game-card');
+                const gameId = gameCard.dataset.id;
+                
+                showConfirmModal(gameId);
+            }
+        });
+
+        // Confirm delete
+        function showConfirmModal(gameId) {
+            const confirmModal = document.getElementById('confirmModal');
+            const confirmBox = document.getElementById('confirmBox');
+            
+            confirmModal.style.display = 'flex';
+            setTimeout(() => {
+                confirmBox.classList.add('active');
+            }, 50);
+            
+            document.getElementById('confirmDelete').onclick = () => {
+                QuantumDB.deleteGame(gameId);
+                renderGames(QuantumDB.loadGames());
+                hideConfirmModal();
+            };
+            
+            document.getElementById('confirmCancel').onclick = hideConfirmModal;
+        }
+
+        function hideConfirmModal() {
+            const confirmBox = document.getElementById('confirmBox');
+            confirmBox.classList.remove('active');
+            
+            setTimeout(() => {
+                document.getElementById('confirmModal').style.display = 'none';
+            }, 300);
+        }
+
+        // Admin login
+        document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                // Successful login
+                localStorage.setItem('quantum_admin_logged_in', 'true');
+                showAdminFeatures();
+                hideLoginModal();
+                alert('Admin access granted!');
+            } else {
+                // Failed login
+                document.getElementById('loginBox').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('loginBox').classList.remove('shake');
+                }, 500);
+                
+                // Clear password field
+                document.getElementById('adminPassword').value = '';
+                
+                // Show error with actual credentials
+                alert(`Invalid credentials!\n\nUse:\nUsername: ${ADMIN_CREDENTIALS.username}\nPassword: ${ADMIN_CREDENTIALS.password}`);
+            }
+        });
+
+        // Show admin features
+        function showAdminFeatures() {
+            // Show delete buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.style.display = 'block';
+            });
+            
+            // Show admin toggle
+            document.getElementById('adminToggle').style.display = 'flex';
+            
+            // Hide login button
+            document.getElementById('adminLoginBtn').style.display = 'none';
+        }
+
+        // Show login modal
+        function showLoginModal() {
+            const loginModal = document.getElementById('loginModal');
+            const loginBox = document.getElementById('loginBox');
+            
+            loginModal.style.display = 'flex';
+            setTimeout(() => {
+                loginBox.classList.add('active');
+            }, 50);
+        }
+
+        // Hide login modal
+        function hideLoginModal() {
+            const loginBox = document.getElementById('loginBox');
+            loginBox.classList.remove('active');
+            
+            setTimeout(() => {
+                document.getElementById('loginModal').style.display = 'none';
+            }, 300);
+        }
+
+        // Admin toggle click
+        document.getElementById('adminToggle').addEventListener('click', (e) => {
+            if (localStorage.getItem('quantum_admin_logged_in') === 'true') {
+                document.getElementById('adminForm').classList.toggle('visible');
+            } else {
+                e.preventDefault();
+                showLoginModal();
+            }
+        });
+
+        // Admin login button click
+        document.getElementById('adminLoginBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoginModal();
+        });
+
+        // Animate game cards on scroll
+        function animateOnScroll() {
+            const gameCards = document.querySelectorAll('.game-card:not(.visible)');
+            gameCards.forEach(card => {
+                const cardPosition = card.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (cardPosition < screenPosition) {
+                    card.classList.add('visible');
+                }
+            });
+        }
+
+        // Initial animation
+        animateOnScroll();
+        
+        // Animate on scroll
+        window.addEventListener('scroll', animateOnScroll);
+
         // Quantum Loader Animation
         window.addEventListener('load', () => {
             const loader = document.getElementById('quantumLoader');
@@ -725,192 +1005,6 @@
                 }, 1000);
             }, 2500);
         });
-
-        // Admin Credentials
-        const ADMIN_CREDENTIALS = {
-            username: "QuantumAdmin",
-            password: "Q#u@n7uM!2023$eCr3t"
-        };
-
-        // DOM Elements
-        const loginModal = document.getElementById('loginModal');
-        const loginBox = document.getElementById('loginBox');
-        const adminLoginForm = document.getElementById('adminLoginForm');
-        const adminToggle = document.getElementById('adminToggle');
-        const adminForm = document.getElementById('adminForm');
-        const gameForm = document.getElementById('gameForm');
-        const gamesContainer = document.getElementById('gamesContainer');
-        const confirmModal = document.getElementById('confirmModal');
-        const confirmBox = document.getElementById('confirmBox');
-        const confirmDeleteBtn = document.getElementById('confirmDelete');
-        const confirmCancelBtn = document.getElementById('confirmCancel');
-
-        // State
-        let isAdminLoggedIn = localStorage.getItem('quantumAdminAuth') === 'true';
-        let gameToDelete = null;
-
-        // Show Admin Features if logged in
-        if (isAdminLoggedIn) {
-            showAdminFeatures();
-        }
-
-        // Admin Toggle Click
-        adminToggle.addEventListener('click', (e) => {
-            if (!isAdminLoggedIn) {
-                e.preventDefault();
-                showLoginModal();
-            } else {
-                adminForm.classList.toggle('visible');
-            }
-        });
-
-        // Admin Login Form Submission
-        adminLoginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-                // Successful login
-                isAdminLoggedIn = true;
-                localStorage.setItem('quantumAdminAuth', 'true');
-                hideLoginModal();
-                showAdminFeatures();
-                alert('Quantum Access Granted! Admin features unlocked.');
-            } else {
-                // Failed login
-                loginBox.classList.add('shake');
-                setTimeout(() => {
-                    loginBox.classList.remove('shake');
-                }, 500);
-                alert('Invalid credentials. Quantum access denied.');
-            }
-        });
-
-        // Game Form Submission
-        gameForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const title = document.getElementById('gameTitle').value;
-            const description = document.getElementById('gameDescription').value;
-            const thumbnail = document.getElementById('gameThumbnail').value;
-            const link = document.getElementById('gameLink').value;
-            
-            addGameToGrid(title, description, thumbnail, link);
-            
-            gameForm.reset();
-            adminForm.classList.remove('visible');
-        });
-
-        // Confirm Delete
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (gameToDelete) {
-                gameToDelete.classList.add('fade-out');
-                setTimeout(() => {
-                    gameToDelete.remove();
-                    gameToDelete = null;
-                    hideConfirmModal();
-                }, 300);
-            }
-        });
-
-        // Cancel Delete
-        confirmCancelBtn.addEventListener('click', hideConfirmModal);
-
-        // Event Delegation for Delete Buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
-                const btn = e.target.classList.contains('delete-btn') ? e.target : e.target.closest('.delete-btn');
-                gameToDelete = btn.closest('.game-card');
-                showConfirmModal();
-            }
-        });
-
-        // Functions
-        function showLoginModal() {
-            loginModal.style.display = 'flex';
-            setTimeout(() => {
-                loginBox.classList.add('active');
-            }, 50);
-        }
-
-        function hideLoginModal() {
-            loginBox.classList.remove('active');
-            setTimeout(() => {
-                loginModal.style.display = 'none';
-            }, 300);
-        }
-
-        function showConfirmModal() {
-            confirmModal.style.display = 'flex';
-            setTimeout(() => {
-                confirmBox.classList.add('active');
-            }, 50);
-        }
-
-        function hideConfirmModal() {
-            confirmBox.classList.remove('active');
-            setTimeout(() => {
-                confirmModal.style.display = 'none';
-            }, 300);
-        }
-
-        function showAdminFeatures() {
-            // Show delete buttons on all game cards
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.style.display = 'block';
-            });
-            
-            // Enable admin form
-            adminForm.style.display = 'block';
-        }
-
-        function addGameToGrid(title, description, thumbnail, link) {
-            const newGame = document.createElement('div');
-            newGame.className = 'game-card';
-            newGame.innerHTML = `
-                <img src="${thumbnail}" class="game-thumbnail" alt="${title}" onerror="this.src='https://via.placeholder.com/400x200/0a0a12/00f2fe?text=QUANTUMSTUDIO'">
-                <div class="game-info">
-                    <h3 class="game-title">${title}</h3>
-                    <p class="game-description">${description}</p>
-                    <div class="game-actions">
-                        <a href="${link}" class="play-btn" target="_blank">PLAY NOW</a>
-                        <button class="delete-btn" ${isAdminLoggedIn ? '' : 'style="display: none;"'}><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
-            
-            gamesContainer.prepend(newGame);
-            
-            setTimeout(() => {
-                newGame.classList.add('visible');
-            }, 10);
-        }
-
-        // Initialize with empty state
-        if (gamesContainer.children.length === 0) {
-            gamesContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--gray);">No games available yet. Check back soon!</p>';
-        }
-
-        // Animate game cards on scroll
-        const animateOnScroll = () => {
-            const gameCards = document.querySelectorAll('.game-card:not(.visible)');
-            gameCards.forEach(card => {
-                const cardPosition = card.getBoundingClientRect().top;
-                const screenPosition = window.innerHeight / 1.3;
-                
-                if (cardPosition < screenPosition) {
-                    card.classList.add('visible');
-                }
-            });
-        };
-
-        // Initial animation
-        animateOnScroll();
-        
-        // Animate on scroll
-        window.addEventListener('scroll', animateOnScroll);
 
         // Add fade-out animation style
         const style = document.createElement('style');
